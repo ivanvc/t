@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -e
+
+if [[ -z "$1" ]] ; then
+  $EDITOR "$T_FILE"
+  exit 0
+fi
+
+list=$(awk 'NF{print}' "$T_FILE")
+if [[ "$1" -gt $(echo "$list" | wc -l) ]] ; then
+  echo "No such task $1" >&2
+  exit 1
+fi
+
+task=$(echo "$list" | awk "NF{if(++a == $1) print \$0}")
+task_number="$1"
+shift
+new="$@"
+
+if [[ -z "$new" ]] ; then
+  file="/tmp/t_$RANDOM"
+  echo "$task" > "$file"
+  $EDITOR "$file"
+  new=$(cat "$file" | head -n1)
+  rm "$file"
+fi
+
+echo "$list" | awk "NF{print (++a == $task_number? \"$new\": \$0)}" > "$T_FILE"
+echo "Ok, changed" >&2
+echo "$new"

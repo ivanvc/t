@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+if [[ -z "$@" ]] ; then
+  error "You need to enter some text"
+  exit 1
+fi
+
+echo "$@" >> "$T_FILE"
+echo "Added task $(awk 'END{print NR}' "$T_FILE"): $@"

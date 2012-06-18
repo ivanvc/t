@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -e
+
+if [[ -z "$T_FILE" ]] ; then
+  echo "You need to set the T_FILE var" >&2
+  exit 1
+fi
+
+if [[ -z "$EDITOR" ]] ; then
+  export EDITOR='vim'
+fi
+
+error() {
+  echo "t Error: $@" >&2
+}
+
+resolve_link() {
+  $(type -p greadlink readlink | head -1) "$1"
+}
+
+abs_dirname() {
+  local cwd="$(pwd)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+usage() {
+  echo "Usage: t <command> [<args>]"
+  echo ""
+  echo "add <task>                            Adds a new task"
+  echo "list [<pattern>]                      Lists and filters tasks"
+  echo "finish <task number>                  Finishes task with that number"
+  echo "edit [<task number> <updated task>]   Edits all/one tasks"
+}
+
+export PATH="$(abs_dirname "$0"):${PATH}"
+
+case "$1" in
+  "--help" | "" )
+    { echo "Easy todo manager"
+      usage
+    } >&2
+    ;;
+  * )
+    path="$(command -v "t-$1" || true)"
+    if [ -z "$path" ]; then
+      echo "t: no such command \`$1'" >&2
+      exit 1
+    fi
+    shift
+    exec "$path" "$@"
+    ;;
+esac
+

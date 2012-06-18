@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+
+if [[ "$1" == "-l" ]] ; then
+  output_list=1
+  shift
+fi
+
+if [[ -z "$1" ]] ; then
+  list=$(awk 'NF{print ++a ": " $0}' "$T_FILE")
+else
+  list=$(awk 'NF{print ++a ": " $0}' "$T_FILE" | grep "$1")
+fi
+
+lines=$(echo "$list" | wc -l | tr -d ' ')
+
+if [ "$output_list" ] ; then
+  echo $lines
+else
+  echo "$list"
+  echo "Number of tasks: $lines"
+fi

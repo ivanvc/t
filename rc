@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+export T_DIR="$HOME/Dropbox/Application Data/todo.txt"                                                                                                                                                                                          
+
+# Your todo/done/report.txt locations
+export T_FILE="$T_DIR/todo.txt"
